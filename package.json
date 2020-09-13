@@ -1,5 +1,5 @@
 {
-  "name": "book_appointment_website",
+  "name": "Book_appointment_website",
   "version": "1.0.0",
   "description": "React_web",
   "main": "server.js",
@@ -9,8 +9,7 @@
     "server": "nodemon server.js",
     "client": "npm start --prefix react_web",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix react_web
-     && npm run build --prefix react_web"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix react_web && npm run build --prefix react_web"
   },
   "repository": {
     "type": "git",
