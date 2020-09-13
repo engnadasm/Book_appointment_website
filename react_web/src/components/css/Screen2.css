@@ -1,0 +1,17 @@
+.lander {
+    padding: 80px 0;
+    text-align: center;
+}
+
+.titles {
+  text-align: center;
+  font-family: PTSansNarrow;
+}
+.form-group{
+  font-family: Alata;
+}
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center
+}
