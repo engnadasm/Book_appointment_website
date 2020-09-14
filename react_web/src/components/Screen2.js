@@ -176,7 +176,7 @@ render() {
 
     return (
 
-        <BorderWrapper style={{marginLeft:'25%'}} className="center">
+        <BorderWrapper  className="center">
         <Container className="center">
 
 
