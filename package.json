@@ -17,7 +17,7 @@
   },
   "author": "nada salama",
   "license": "ISC",
-  "bugs": {
+  "bugs": { 
     "url": "https://github.com/engnadasm/Book_appointment_website/issues"
   },
   "homepage": "https://github.com/engnadasm/Book_appointment_website#readme",
@@ -25,6 +25,7 @@
     "body-parser": "^1.19.0",
     "concurrently": "^5.3.0",
     "express": "^4.17.1",
-    "mongoose": "^5.10.4"
+    "mongoose": "^5.10.4",
+    "mongoose-type-email": "^1.0.12"
   }
 }

@@ -1,8 +1,13 @@
-import React, { Component , useState } from 'react';
-import { Container, ListGroup, ListGroupItem, Button, Alert } from 'reactstrap';
+import React, { Component  } from 'react';
+import { Container, Button, Alert } from 'reactstrap';
+import {
+  Form,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
 import './css/Screen2.css';
 import 'react-phone-number-input/style.css';
-import PhoneInput from 'react-phone-number-input';
 import makeAnimated from 'react-select/animated';
 import IntlTelInput from 'react-intl-tel-input';
 import 'react-intl-tel-input/dist/main.css';
@@ -14,12 +19,12 @@ import {IconContext} from "react-icons"
 import CreatableSelect from 'react-select/creatable'
 import history from './../history';
 
+import { connect } from 'react-redux';
+import { addRequest } from '../actions/requestAction';
 
 class Screen2 extends Component {
 
-    constructor(props) {
-        super();
-        this.state = {
+    state = {
             setValidated: false,
             validated: false,
             phone:"",
@@ -39,13 +44,25 @@ class Screen2 extends Component {
             options3 : [
               { value: 'Compliant', label: 'Compliant' },
               { value: 'Suggestion', label: 'Suggestion' }
-            ]
+            ],
+            modal: false,
+            firstName: '',
+            lastName: '',
+            workEmail: '',
+            phoneNumber: '',
+            country: [],
+            company: [],
+            objective: [],
+            details: ''
         };
 
-
-    }
-
     toggle = () => {this.setState({ visible: false });}
+
+    toggle3 = () => {
+      this.setState({
+        modal: !this.state.modal
+      });
+    };
 
     show=()=>{
     	console.log("enter-----------------------")
@@ -63,9 +80,37 @@ class Screen2 extends Component {
     	history.push('/');
     }
 
-    summit=()=>{
-    	history.push('/Screen3');
-    }
+    onChange = e => {
+      this.setState({ [e.target.name]: e.target.value });
+    };
+
+    onSubmit = e => {
+      console.log("enter-----------------------")
+
+      e.preventDefault();
+
+      const newRequest = {
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        workEmail: this.state.workEmail,
+        phoneNumber: this.state.phoneNumber,
+        country: this.state.country,
+        company:  this.state.company,
+        objective: this.state.objective,
+        details: this.state.details
+      };
+      console.log(this.state.firstName + this.state.lastName+
+      this.state.workEmail+this.state.phoneNumber+this.state.details);
+
+      // Add Request via addRequest action
+      this.props.addRequest(newRequest);
+
+      // Close modal
+      this.toggle();
+      history.push('/Screen3');
+
+    };
+
 
     handleChange = (newValue: any, actionMeta: any) => {
     console.group('Value Changed');
@@ -106,15 +151,19 @@ render() {
         </div>
         </div>
 
-        <form>
+        <Form onSubmit={this.onSubmit}>
 
-        <div className="form-group">
+        <FormGroup>
             <div className="row">
 
                 <div className="col">
-                    <label htmlFor="inputName1">First Name</label>
-                    <input type="text" className="form-control" id="inputName1" placeholder="First Name"
-                        pattern="[a-z]+" required></input>
+                    <Label for="inputName1">First Name</Label>
+                    <Input  className="form-control" id="inputName1" placeholder="First Name"
+                        pattern="[a-z]+" required
+                        type="text"
+                        name="firstName"
+                        onChange={this.onChange}
+                        />
                     <span style={{color: "red"}} className="invalid-message" id="userName1">
                       {this.state.errors["userName1"]}
                     </span>
@@ -122,31 +171,36 @@ render() {
 
                 <div className="col">
 
-    <label htmlFor="inputName2">Last Name</label>
-<input type="text" className="form-control" id="inputName2" placeholder="Last Name"
-pattern="[a-z]+" required></input>
+    <Label for="inputName2">Last Name</Label>
+<Input type="text"
+name="lastName"
+onChange={this.onChange} className="form-control" id="inputName2" placeholder="Last Name"
+pattern="[a-z]+" required/>
 <span style={{color: "red"}} className="invalid-message" id="userName2">
     {this.state.errors["userName2"]}
 </span>
                 </div>
           </div>
-        </div>
+        </FormGroup>
 
-        <div className="form-group">
-          <label htmlFor="email">Work Email Address</label>
-          <input type="email" className="form-control" id="email" placeholder="Work Email Address"
-           required></input>
+        <FormGroup>
+          <Label for="email">Work Email Address</Label>
+          <Input type="email"   name="workEmail"
+            onChange={this.onChange} className="form-control" id="email" placeholder="Work Email Address"
+           required/>
           <span style={{color: "red"}} className="invalid-message" id="email">
               {this.state.errors["email"]}
           </span>
-        </div>
+        </FormGroup>
 
-        <div className="form-group">
-          <label htmlFor="inputPhone">Phone Number</label>
+        <FormGroup>
+          <Label for="phone">Phone Number</Label>
           <IntlTelInput
           containerClassName="intl-tel-input"
           inputClassName="form-control"
 
+          name="phoneNumber"
+          onChange={this.onChange}
           inputPattern="[0-9]+"
           inputType="phone" className="form-control" id="phone"
           valueRequired
@@ -154,17 +208,17 @@ pattern="[a-z]+" required></input>
           <span style={{color: "red"}} className="invalid-message" id="phone">
               {this.state.errors["phone"]}
           </span>
-        </div>
+        </FormGroup>
 
-        <div className="form-group">
+        <FormGroup>
 
-          <label htmlFor="Operation">Operation countries </label>
+          <Label for="Operation">Operation countries </Label>
               <div className="row">
 
                   <div className="col-8">
           <Select
+          id = "Operation"
           components={animatedComponents}
-          className="form-control"
           placeholder="Operation countries"
           isMulti
           name="colors"
@@ -192,16 +246,15 @@ pattern="[a-z]+" required></input>
           <span style={{color: "red"}} className="invalid-message" id="Operation">
           {this.state.errors["Operation"]}
           </span>
-        </div>
+        </FormGroup>
 
-        <div className="form-group">
+        <FormGroup>
 
           <label htmlFor="Operation"> Company Name </label>
               <div className="row">
                 <div className="col-8">
           <Select
           components={animatedComponents}
-          className="form-control"
           placeholder="Company Name"
           isMulti
           name="colors"
@@ -224,14 +277,14 @@ pattern="[a-z]+" required></input>
                 </div>
                 </div>
 
-        </div>
+        </FormGroup>
 
-        <div className="form-group">
-          <label htmlFor="Operation"> Objective </label>
+        <FormGroup>
+          <Label for="Objective"> Objective </Label>
           <CreatableSelect
+          id = "Objective"
           isClearable
           components={animatedComponents}
-          className="form-control"
           placeholder="Objective"
           isMulti
           name="colors"
@@ -242,16 +295,20 @@ pattern="[a-z]+" required></input>
           classNamePrefix="select"
           required
           />
-        </div>
+        </FormGroup>
 
-        <div className="form-group">
-          <textarea className="form-control" id="Textarea1" placeholder="More Details Description" rows="5"></textarea>
-        </div>
+        <FormGroup>
+          <textarea className="form-control" type="text"
+          name="details"
+          onChange={this.onChange} id="Textarea1" placeholder="More Details Description" rows="5"></textarea>
 
-        <button className="btn btn-outline-dark float-right" type="submit" onClick={this.summit}>
-          <i className="fa fa-sign-in"></i> Request an appointment</button>
+          <Button color="dark" style={{ marginTop: '2rem' }} block>
+            <i className="fa fa-sign-in"></i> Request an appointment</Button>
+        </FormGroup>
 
-      </form>
+
+
+      </Form>
       </div>
       </div>
       </Container>
@@ -260,4 +317,11 @@ pattern="[a-z]+" required></input>
 }
 }
 
-export default Screen2;
+const mapStateToProps = state => ({
+  request: state.request
+});
+
+export default connect(
+  mapStateToProps,
+  { addRequest}
+)(Screen2);

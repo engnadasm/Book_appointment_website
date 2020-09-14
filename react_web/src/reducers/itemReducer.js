@@ -1,17 +1,13 @@
 import {
   GET_ITEMS,
   ADD_ITEM,
-  DELETE_ITEM
+  DELETE_ITEM,
+  ITEMS_LOADING
 } from '../actions/types';
-import {v1 as uuid} from "uuid";
 
 const initialState = {
-  items: [
-    { id: uuid(), name: 'Eggs' },
-    { id: uuid(), name: 'Milk' },
-    { id: uuid(), name: 'Steak' },
-    { id: uuid(), name: 'Water' }
-  ]
+  items: [],
+  loading: false
 }
 
 export default function(state = initialState, action) {
@@ -32,6 +28,11 @@ export default function(state = initialState, action) {
         ...state,
         items: [action.payload, ...state.items]
       };
+    case ITEMS_LOADING:
+     return {
+       ...state,
+       loading: true
+     };
     default:
       return state;
   }
