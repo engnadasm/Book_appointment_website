@@ -45,24 +45,17 @@ class Screen2 extends Component {
               { value: 'Compliant', label: 'Compliant' },
               { value: 'Suggestion', label: 'Suggestion' }
             ],
-            modal: false,
             firstName: '',
             lastName: '',
             workEmail: '',
             phoneNumber: '',
-            country: [],
-            company: [],
-            objective: [],
+            selectedOption1: null,
+            selectedOption2: null,
+            selectedOption3: null,
             details: ''
         };
 
     toggle = () => {this.setState({ visible: false });}
-
-    toggle3 = () => {
-      this.setState({
-        modal: !this.state.modal
-      });
-    };
 
     show=()=>{
     	console.log("enter-----------------------")
@@ -81,8 +74,14 @@ class Screen2 extends Component {
     }
 
     onChange = e => {
+      console.log(e.target.name + "..."+ e.target.value)
       this.setState({ [e.target.name]: e.target.value });
     };
+    handlePhoneChange = (value, country, event, formattedValue) => {
+      console.log(value + "..."+ country+"...."+ event+ "..."+ formattedValue);
+      this.setState({ phoneNumber : formattedValue });
+
+   };
 
     onSubmit = e => {
       console.log("enter-----------------------")
@@ -94,9 +93,9 @@ class Screen2 extends Component {
         lastName: this.state.lastName,
         workEmail: this.state.workEmail,
         phoneNumber: this.state.phoneNumber,
-        country: this.state.country,
-        company:  this.state.company,
-        objective: this.state.objective,
+        country: this.state.selectedOption1,
+        company:  this.state.selectedOption2,
+        objective: this.state.selectedOption3,
         details: this.state.details
       };
       console.log(this.state.firstName + this.state.lastName+
@@ -111,10 +110,27 @@ class Screen2 extends Component {
 
     };
 
+    handleChange1 = selectedOption1 => {
+        this.setState(
+          { selectedOption1 },
+          () => console.log(`Option selected:`, this.state.selectedOption1)
+        );
+      };
 
-    handleChange = (newValue: any, actionMeta: any) => {
+    handleChange2 = selectedOption2 => {
+          this.setState(
+            { selectedOption2 },
+            () => console.log(`Option selected:`, this.state.selectedOption2)
+          );
+        };
+
+    handleChange = (selectedOption3: any, actionMeta: any) => {
     console.group('Value Changed');
-    console.log(newValue);
+    //console.log(selectedOption3);
+    this.setState(
+      { selectedOption3 },
+      () => console.log(this.state.selectedOption3)
+    );
     console.log(`action: ${actionMeta.action}`);
     console.groupEnd();
     };
@@ -197,12 +213,12 @@ pattern="[a-z]+" required/>
           <Label for="phone">Phone Number</Label>
           <IntlTelInput
           containerClassName="intl-tel-input"
-          inputClassName="form-control"
+          inputClassName="form-control phoneNumber"
 
-          name="phoneNumber"
-          onChange={this.onChange}
-          inputPattern="[0-9]+"
-          inputType="phone" className="form-control" id="phone"
+          fieldName="phoneNumber"
+          onPhoneNumberChange={this.handlePhoneChange}
+          type="tel"
+          className="form-control" fieldId="phone"
           valueRequired
           />
           <span style={{color: "red"}} className="invalid-message" id="phone">
@@ -217,6 +233,7 @@ pattern="[a-z]+" required/>
 
                   <div className="col-8">
           <Select
+          onChange={this.handleChange1}
           id = "Operation"
           components={animatedComponents}
           placeholder="Operation countries"
@@ -240,9 +257,6 @@ pattern="[a-z]+" required/>
                 </IconContext.Provider>
                 </div>
                 </div>
-
-          <small className="form-text text-muted">
-          Must be at least 6 characters long, contain letters and numbers</small>
           <span style={{color: "red"}} className="invalid-message" id="Operation">
           {this.state.errors["Operation"]}
           </span>
@@ -261,6 +275,7 @@ pattern="[a-z]+" required/>
           options={this.state.options2}
           className="basic-multi-select"
           classNamePrefix="select"
+          onChange={this.handleChange2}
           required
           />
           </div>
