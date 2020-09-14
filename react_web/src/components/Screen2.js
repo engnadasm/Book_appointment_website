@@ -45,6 +45,7 @@ class Screen2 extends Component {
               { value: 'Compliant', label: 'Compliant' },
               { value: 'Suggestion', label: 'Suggestion' }
             ],
+            isDisabled: true,
             firstName: '',
             lastName: '',
             workEmail: '',
@@ -58,14 +59,12 @@ class Screen2 extends Component {
     toggle = () => {this.setState({ visible: false });}
 
     show=()=>{
-    	console.log("enter-----------------------")
     	this.setState({ visible: true });
     }
 
     toggle2 = () => {this.setState({ visible2: false });}
 
     show2=()=>{
-    	console.log("enter-----------------------")
     	this.setState({ visible2: true });
     }
 
@@ -74,18 +73,13 @@ class Screen2 extends Component {
     }
 
     onChange = e => {
-      console.log(e.target.name + "..."+ e.target.value)
       this.setState({ [e.target.name]: e.target.value });
     };
     handlePhoneChange = (value, country, event, formattedValue) => {
-      console.log(value + "..."+ country+"...."+ event+ "..."+ formattedValue);
-      this.setState({ phoneNumber : formattedValue });
-
+      this.setState({ phoneNumber : country });
    };
 
     onSubmit = e => {
-      console.log("enter-----------------------")
-
       e.preventDefault();
 
       const newRequest = {
@@ -98,8 +92,6 @@ class Screen2 extends Component {
         objective: this.state.selectedOption3,
         details: this.state.details
       };
-      console.log(this.state.firstName + this.state.lastName+
-      this.state.workEmail+this.state.phoneNumber+this.state.details);
 
       // Add Request via addRequest action
       this.props.addRequest(newRequest);
@@ -111,22 +103,59 @@ class Screen2 extends Component {
     };
 
     handleChange1 = selectedOption1 => {
+        this.setState({ isDisabled : false });
+        if(selectedOption1 === null){
+          this.setState({ isDisabled : true });
+          this.setState({ selectedOption2 : null });
+        }else {
+        if(selectedOption1.length === 1){
+          if(selectedOption1[0].value === "Country1"){
+            this.setState({options2 : [
+            { value: 'Country1', label: 'Country1' },
+            { value: 'Country2', label: 'Country2' }
+          ]});}
+
+          else{
+            this.setState({options2 : [
+            { value: 'Country3', label: 'Country3' }
+          ]});}
+        }
+        if(selectedOption1.length === 2 && (selectedOption1[0].value === "Country1"
+        ||selectedOption1[1].value === "Country1")){
+          this.setState({options2 : [
+            { value: 'Country1', label: 'Country1' },
+            { value: 'Country2', label: 'Country2' },
+            { value: 'Country3', label: 'Country3' }
+            ]});
+        }
+
+        if(selectedOption1.length === 3 && (selectedOption1[0].value === "Country1"
+        ||selectedOption1[1].value === "Country1" || selectedOption1[2].value === "Country1")){
+          this.setState({options2 : [
+            { value: 'Country1', label: 'Country1' },
+            { value: 'Country2', label: 'Country2' },
+            { value: 'Country3', label: 'Country3' }
+            ]});
+        }
+      }
         this.setState(
           { selectedOption1 },
           () => console.log(`Option selected:`, this.state.selectedOption1)
         );
       };
 
-    handleChange2 = selectedOption2 => {
-          this.setState(
-            { selectedOption2 },
-            () => console.log(`Option selected:`, this.state.selectedOption2)
-          );
-        };
+    handleChange2 = (selectedOption2: any, actionMeta: any) => {
+      this.setState(
+        { selectedOption2 },
+        () => console.log(this.state.selectedOption2)
+      );
+      console.log(`action: ${actionMeta.action}`);
+      console.groupEnd();
+    };
+
 
     handleChange = (selectedOption3: any, actionMeta: any) => {
     console.group('Value Changed');
-    //console.log(selectedOption3);
     this.setState(
       { selectedOption3 },
       () => console.log(this.state.selectedOption3)
@@ -267,10 +296,12 @@ pattern="[a-z]+" required/>
           <label htmlFor="Operation"> Company Name </label>
               <div className="row">
                 <div className="col-8">
-          <Select
+          <CreatableSelect
+          isClearable
           components={animatedComponents}
           placeholder="Company Name"
-          isMulti
+
+          isDisabled = {this.state.isDisabled}
           name="colors"
           options={this.state.options2}
           className="basic-multi-select"
