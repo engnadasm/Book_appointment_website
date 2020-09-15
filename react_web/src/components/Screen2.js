@@ -1,8 +1,13 @@
-import React, { Component , useState } from 'react';
-import { Container, ListGroup, ListGroupItem, Button, Alert } from 'reactstrap';
+import React, { Component  } from 'react';
+import { Container, Button, Alert } from 'reactstrap';
+import {
+  Form,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
 import './css/Screen2.css';
 import 'react-phone-number-input/style.css';
-import PhoneInput from 'react-phone-number-input';
 import makeAnimated from 'react-select/animated';
 import IntlTelInput from 'react-intl-tel-input';
 import 'react-intl-tel-input/dist/main.css';
@@ -14,12 +19,12 @@ import {IconContext} from "react-icons"
 import CreatableSelect from 'react-select/creatable'
 import history from './../history';
 
+import { connect } from 'react-redux';
+import { addRequest } from '../actions/requestAction';
 
 class Screen2 extends Component {
 
-    constructor(props) {
-        super();
-        this.state = {
+    state = {
             setValidated: false,
             validated: false,
             phone:"",
@@ -39,23 +44,27 @@ class Screen2 extends Component {
             options3 : [
               { value: 'Compliant', label: 'Compliant' },
               { value: 'Suggestion', label: 'Suggestion' }
-            ]
+            ],
+            isDisabled: true,
+            firstName: '',
+            lastName: '',
+            workEmail: '',
+            phoneNumber: '',
+            selectedOption1: null,
+            selectedOption2: null,
+            selectedOption3: null,
+            details: ''
         };
-
-
-    }
 
     toggle = () => {this.setState({ visible: false });}
 
     show=()=>{
-    	console.log("enter-----------------------")
     	this.setState({ visible: true });
     }
 
     toggle2 = () => {this.setState({ visible2: false });}
 
     show2=()=>{
-    	console.log("enter-----------------------")
     	this.setState({ visible2: true });
     }
 
@@ -63,13 +72,94 @@ class Screen2 extends Component {
     	history.push('/');
     }
 
-    summit=()=>{
-    	history.push('/Screen3');
-    }
+    onChange = e => {
+      this.setState({ [e.target.name]: e.target.value });
+    };
+    handlePhoneChange = (value, country, event, formattedValue) => {
+      this.setState({ phoneNumber : country });
+   };
 
-    handleChange = (newValue: any, actionMeta: any) => {
+    onSubmit = e => {
+      e.preventDefault();
+
+      const newRequest = {
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        workEmail: this.state.workEmail,
+        phoneNumber: this.state.phoneNumber,
+        country: this.state.selectedOption1,
+        company:  this.state.selectedOption2,
+        objective: this.state.selectedOption3,
+        details: this.state.details
+      };
+
+      // Add Request via addRequest action
+      this.props.addRequest(newRequest);
+
+      // Close modal
+      this.toggle();
+      history.push('/Screen3');
+
+    };
+
+    handleChange1 = selectedOption1 => {
+        this.setState({ isDisabled : false });
+        if(selectedOption1 === null){
+          this.setState({ isDisabled : true });
+          this.setState({ selectedOption2 : null });
+        }else {
+        if(selectedOption1.length === 1){
+          if(selectedOption1[0].value === "Country1"){
+            this.setState({options2 : [
+            { value: 'Country1', label: 'Country1' },
+            { value: 'Country2', label: 'Country2' }
+          ]});}
+
+          else{
+            this.setState({options2 : [
+            { value: 'Country3', label: 'Country3' }
+          ]});}
+        }
+        if(selectedOption1.length === 2 && (selectedOption1[0].value === "Country1"
+        ||selectedOption1[1].value === "Country1")){
+          this.setState({options2 : [
+            { value: 'Country1', label: 'Country1' },
+            { value: 'Country2', label: 'Country2' },
+            { value: 'Country3', label: 'Country3' }
+            ]});
+        }
+
+        if(selectedOption1.length === 3 && (selectedOption1[0].value === "Country1"
+        ||selectedOption1[1].value === "Country1" || selectedOption1[2].value === "Country1")){
+          this.setState({options2 : [
+            { value: 'Country1', label: 'Country1' },
+            { value: 'Country2', label: 'Country2' },
+            { value: 'Country3', label: 'Country3' }
+            ]});
+        }
+      }
+        this.setState(
+          { selectedOption1 },
+          () => console.log(`Option selected:`, this.state.selectedOption1)
+        );
+      };
+
+    handleChange2 = (selectedOption2: any, actionMeta: any) => {
+      this.setState(
+        { selectedOption2 },
+        () => console.log(this.state.selectedOption2)
+      );
+      console.log(`action: ${actionMeta.action}`);
+      console.groupEnd();
+    };
+
+
+    handleChange = (selectedOption3: any, actionMeta: any) => {
     console.group('Value Changed');
-    console.log(newValue);
+    this.setState(
+      { selectedOption3 },
+      () => console.log(this.state.selectedOption3)
+    );
     console.log(`action: ${actionMeta.action}`);
     console.groupEnd();
     };
@@ -86,7 +176,7 @@ render() {
 
     return (
 
-        <BorderWrapper style={{marginLeft:'25%'}} className="center">
+        <BorderWrapper  className="center">
         <Container className="center">
 
 
@@ -106,15 +196,19 @@ render() {
         </div>
         </div>
 
-        <form>
+        <Form onSubmit={this.onSubmit}>
 
-        <div className="form-group">
+        <FormGroup>
             <div className="row">
 
                 <div className="col">
-                    <label htmlFor="inputName1">First Name</label>
-                    <input type="text" className="form-control" id="inputName1" placeholder="First Name"
-                        pattern="[a-z]+" required></input>
+                    <Label for="inputName1">First Name</Label>
+                    <Input  className="form-control" id="inputName1" placeholder="First Name"
+                        pattern="[a-z]+" required
+                        type="text"
+                        name="firstName"
+                        onChange={this.onChange}
+                        />
                     <span style={{color: "red"}} className="invalid-message" id="userName1">
                       {this.state.errors["userName1"]}
                     </span>
@@ -122,49 +216,55 @@ render() {
 
                 <div className="col">
 
-    <label htmlFor="inputName2">Last Name</label>
-<input type="text" className="form-control" id="inputName2" placeholder="Last Name"
-pattern="[a-z]+" required></input>
+    <Label for="inputName2">Last Name</Label>
+<Input type="text"
+name="lastName"
+onChange={this.onChange} className="form-control" id="inputName2" placeholder="Last Name"
+pattern="[a-z]+" required/>
 <span style={{color: "red"}} className="invalid-message" id="userName2">
     {this.state.errors["userName2"]}
 </span>
                 </div>
           </div>
-        </div>
+        </FormGroup>
 
-        <div className="form-group">
-          <label htmlFor="email">Work Email Address</label>
-          <input type="email" className="form-control" id="email" placeholder="Work Email Address"
-           required></input>
+        <FormGroup>
+          <Label for="email">Work Email Address</Label>
+          <Input type="email"   name="workEmail"
+            onChange={this.onChange} className="form-control" id="email" placeholder="Work Email Address"
+           required/>
           <span style={{color: "red"}} className="invalid-message" id="email">
               {this.state.errors["email"]}
           </span>
-        </div>
+        </FormGroup>
 
-        <div className="form-group">
-          <label htmlFor="inputPhone">Phone Number</label>
+        <FormGroup>
+          <Label for="phone">Phone Number</Label>
           <IntlTelInput
           containerClassName="intl-tel-input"
-          inputClassName="form-control"
+          inputClassName="form-control phoneNumber"
 
-          inputPattern="[0-9]+"
-          inputType="phone" className="form-control" id="phone"
+          fieldName="phoneNumber"
+          onPhoneNumberChange={this.handlePhoneChange}
+          type="tel"
+          className="form-control" fieldId="phone"
           valueRequired
           />
           <span style={{color: "red"}} className="invalid-message" id="phone">
               {this.state.errors["phone"]}
           </span>
-        </div>
+        </FormGroup>
 
-        <div className="form-group">
+        <FormGroup>
 
-          <label htmlFor="Operation">Operation countries </label>
+          <Label for="Operation">Operation countries </Label>
               <div className="row">
 
                   <div className="col-8">
           <Select
+          onChange={this.handleChange1}
+          id = "Operation"
           components={animatedComponents}
-          className="form-control"
           placeholder="Operation countries"
           isMulti
           name="colors"
@@ -186,28 +286,27 @@ pattern="[a-z]+" required></input>
                 </IconContext.Provider>
                 </div>
                 </div>
-
-          <small className="form-text text-muted">
-          Must be at least 6 characters long, contain letters and numbers</small>
           <span style={{color: "red"}} className="invalid-message" id="Operation">
           {this.state.errors["Operation"]}
           </span>
-        </div>
+        </FormGroup>
 
-        <div className="form-group">
+        <FormGroup>
 
           <label htmlFor="Operation"> Company Name </label>
               <div className="row">
                 <div className="col-8">
-          <Select
+          <CreatableSelect
+          isClearable
           components={animatedComponents}
-          className="form-control"
           placeholder="Company Name"
-          isMulti
+
+          isDisabled = {this.state.isDisabled}
           name="colors"
           options={this.state.options2}
           className="basic-multi-select"
           classNamePrefix="select"
+          onChange={this.handleChange2}
           required
           />
           </div>
@@ -224,14 +323,14 @@ pattern="[a-z]+" required></input>
                 </div>
                 </div>
 
-        </div>
+        </FormGroup>
 
-        <div className="form-group">
-          <label htmlFor="Operation"> Objective </label>
+        <FormGroup>
+          <Label for="Objective"> Objective </Label>
           <CreatableSelect
+          id = "Objective"
           isClearable
           components={animatedComponents}
-          className="form-control"
           placeholder="Objective"
           isMulti
           name="colors"
@@ -242,16 +341,20 @@ pattern="[a-z]+" required></input>
           classNamePrefix="select"
           required
           />
-        </div>
+        </FormGroup>
 
-        <div className="form-group">
-          <textarea className="form-control" id="Textarea1" placeholder="More Details Description" rows="5"></textarea>
-        </div>
+        <FormGroup>
+          <textarea className="form-control" type="text"
+          name="details"
+          onChange={this.onChange} id="Textarea1" placeholder="More Details Description" rows="5"></textarea>
 
-        <button className="btn btn-outline-dark float-right" type="submit" onClick={this.summit}>
-          <i className="fa fa-sign-in"></i> Request an appointment</button>
+          <Button color="dark" style={{ marginTop: '2rem' }} block>
+            <i className="fa fa-sign-in"></i> Request an appointment</Button>
+        </FormGroup>
 
-      </form>
+
+
+      </Form>
       </div>
       </div>
       </Container>
@@ -260,4 +363,11 @@ pattern="[a-z]+" required></input>
 }
 }
 
-export default Screen2;
+const mapStateToProps = state => ({
+  request: state.request
+});
+
+export default connect(
+  mapStateToProps,
+  { addRequest}
+)(Screen2);

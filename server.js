@@ -1,7 +1,7 @@
 const express = require('express');//for server
 const mongoose = require('mongoose');//we use it as database
 const bodyParser = require('body-parser');//take request and get date from the body
-const items = require('./routes/api/items');
+const requests = require('./routes/api/request');
 const path = require('path');
 
 const app = express();
@@ -21,7 +21,7 @@ mongoose.connect(db, {
   }).then(console.log('mongoDB Connected.....')).catch(err =>console.log(err));
 
 //Use routes
-app.use('/api/items', items);
+app.use('/api/request', requests);
 
 // server
 if(process.env.NODE_ENV == 'production'){
@@ -29,7 +29,7 @@ if(process.env.NODE_ENV == 'production'){
 
   app.get('*',(req, res)=>{
     res.sendFile(path.resolve(__dirname,'react_web', 'build', 'index.html'));
-    
+
   });
 }
 

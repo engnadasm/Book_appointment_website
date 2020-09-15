@@ -1,0 +1,4 @@
+export const GET_REQUESTS = 'GET_REQUESTS';
+export const ADD_REQUEST = 'ADD_REQUEST';
+export const DELETE_REQUEST = 'DELETE_REQUEST';
+export const REQUEST_LOADING = 'REQUEST_LOADING';
